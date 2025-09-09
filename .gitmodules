@@ -1,0 +1,6 @@
+[submodule "web"]
+	path = web
+	url = git@github.com:ton-utilisateur/web.git
+[submodule "api"]
+	path = api
+	url = git@github.com:ton-utilisateur/api.git
