@@ -1,0 +1,6 @@
+[submodule "web"]
+	path = web
+	url = https://github.com/Sampanionyy/suivi-candidature-web
+[submodule "api"]
+	path = api
+	url = https://github.com/Sampanionyy/suivi-candidature-api
