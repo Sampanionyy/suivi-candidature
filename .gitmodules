@@ -1,6 +1,6 @@
 [submodule "web"]
 	path = web
-	url = git@github.com:ton-utilisateur/web.git
+	url = git@github.com:sampanionyy/web.git
 [submodule "api"]
 	path = api
-	url = git@github.com:ton-utilisateur/api.git
+	url = git@github.com:sampanionyy/api.git
