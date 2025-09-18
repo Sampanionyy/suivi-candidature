@@ -145,11 +145,6 @@ git commit -m "Update API submodule to latest version"
 git push
 ```
 
-## 📖 Documentation
-
-- [Documentation API Laravel](./api/README.md)
-- [Documentation Interface React](./web/README.md)
-
 ## 🛠️ Technologies utilisées
 
 ### Backend (API)
