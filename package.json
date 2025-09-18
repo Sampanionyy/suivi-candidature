@@ -1,0 +1,11 @@
+{
+  "name": "suivi-candidature",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"cd api && php artisan serve\" \"cd web && npm run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
