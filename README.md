@@ -42,10 +42,6 @@ docker-compose exec api php artisan key:generate
 # Exécuter les migrations
 docker-compose exec api php artisan migrate
 
-# (Optionnel) Seed de données de test
-docker-compose exec api php artisan db:seed
-```
-
 **C'est tout ! 🎉** 
 - L'API Laravel est disponible sur `http://localhost:8000`
 - L'interface React est disponible sur `http://localhost:5173`
