@@ -29,18 +29,28 @@ cd suivi-candidature
 git submodule update --init --recursive
 ```
 
-2. **Lancer l'application avec Docker**
+2. **Créer les fichiers d'environnement**
+```bash
+# Copier le fichier .env pour l'API
+cp api/.env.example api/.env
+
+# Copier le fichier .env pour l'interface web
+cp web/.env.example web/.env
+```
+
+3. **Lancer l'application avec Docker**
 ```bash
 docker-compose up -d
 ```
 
-3. **Configuration initiale (première utilisation uniquement)**
+4. **Configuration initiale (première utilisation uniquement)**
 ```bash
 # Générer la clé Laravel
 docker-compose exec api php artisan key:generate
 
 # Exécuter les migrations
 docker-compose exec api php artisan migrate
+```
 
 **C'est tout ! 🎉** 
 - L'API Laravel est disponible sur `http://localhost:8000`
@@ -88,7 +98,20 @@ git clone --recurse-submodules https://github.com/Sampanionyy/suivi-candidature.
 cd suivi-candidature
 ```
 
-2. **Installer les dépendances**
+2. **Créer les fichiers d'environnement**
+```bash
+# API Laravel
+cd api
+cp .env.example .env
+cd ..
+
+# Interface web
+cd web
+cp .env.example .env
+cd ..
+```
+
+3. **Installer les dépendances**
 ```bash
 # Dépendances du projet principal
 npm install
@@ -96,7 +119,6 @@ npm install
 # API Laravel (submodule)
 cd api
 composer install
-cp .env.example .env
 php artisan key:generate
 php artisan migrate 
 cd ..
@@ -107,7 +129,7 @@ npm install
 cd ..
 ```
 
-3. **Configuration**
+4. **Configuration**
 - Configurer la base de données dans `api/.env`
 - Configurer l'URL de l'API dans `web/.env` (VITE_API_URL=http://localhost:8000/api)
 
@@ -258,17 +280,19 @@ git push
 
 ### Avec Docker (Méthode recommandée)
 1. Suivez les étapes d'installation Docker ci-dessus
-2. Lancez `docker-compose up -d`
-3. L'API sera disponible sur http://localhost:8000
-4. L'interface web sera disponible sur http://localhost:5173
-5. Consultez les logs avec `docker-compose logs -f`
+2. Créez les fichiers `.env` à partir des `.env.example`
+3. Lancez `docker-compose up -d`
+4. L'API sera disponible sur http://localhost:8000
+5. L'interface web sera disponible sur http://localhost:5173
+6. Consultez les logs avec `docker-compose logs -f`
 
 ### Sans Docker
 1. Suivez les étapes d'installation manuelle
-2. Lancez `npm start` pour démarrer l'environnement de développement
-3. L'API sera disponible sur http://localhost:8000
-4. L'interface web sera disponible sur http://localhost:5173
-5. Consultez les README des submodules pour des détails spécifiques
+2. Créez les fichiers `.env` à partir des `.env.example`
+3. Lancez `npm start` pour démarrer l'environnement de développement
+4. L'API sera disponible sur http://localhost:8000
+5. L'interface web sera disponible sur http://localhost:5173
+6. Consultez les README des submodules pour des détails spécifiques
 
 ## 🔍 Dépannage
 
@@ -297,6 +321,14 @@ docker-compose exec api php artisan migrate
 # Ajuster les permissions Laravel
 docker-compose exec api chown -R www-data:www-data /var/www/html/storage
 docker-compose exec api chmod -R 775 /var/www/html/storage
+```
+
+**Fichiers .env manquants :**
+```bash
+# Si vous avez oublié de créer les fichiers .env
+cp api/.env.example api/.env
+cp web/.env.example web/.env
+docker-compose restart
 ```
 
 ---
