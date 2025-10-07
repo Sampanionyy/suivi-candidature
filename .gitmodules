@@ -5,3 +5,4 @@
 [submodule "api"]
 	path = api
 	url = https://github.com/Sampanionyy/suivi-candidature-api
+	branch = main
