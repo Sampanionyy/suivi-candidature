@@ -2,3 +2,6 @@
 	path = web
 	url = https://github.com/Sampanionyy/suivi-candidature-web
 	branch = main
+[submodule "api"]
+	path = api
+	url = https://github.com/Sampanionyy/suivi-candidature-api
