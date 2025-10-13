@@ -158,6 +158,7 @@ suivi-candidature/
 │   │   ├── migrations/  # Tables users, applications, documents, profiles
 │   │   └── seeders/     # ApplicationSeeder, DatabaseSeeder
 │   └── routes/api.php   # Routes API
+|   └── Dockerfile 
 ├── web/                 # Submodule - Interface React + TypeScript
 │   ├── src/
 │   │   ├── components/  # Composants réutilisables
@@ -169,9 +170,8 @@ suivi-candidature/
 │   │   └── utils/       # Utilitaires
 │   ├── tailwind.config.js
 │   └── vite.config.ts
+|   └── Dockerfile 
 ├── docker-compose.yml   # Configuration Docker
-├── Dockerfile.api       # Image Docker pour l'API
-├── Dockerfile.web       # Image Docker pour l'interface
 ├── package.json         # Configuration du projet principal
 ├── .gitmodules          # Configuration des submodules
 └── README.md           # Ce fichier
