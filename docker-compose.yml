@@ -44,9 +44,9 @@ services:
             - APP_DEBUG=false
         entrypoint: >
             sh -c "
-            php artisan config:cache &&
-            php artisan route:cache &&
-            php artisan view:cache &&
+            php artisan config:clear &&
+            php artisan route:clear &&
+            php artisan view:clear &&
             php artisan storage:link --force &&
             php artisan migrate --force &&
             apache2-foreground
