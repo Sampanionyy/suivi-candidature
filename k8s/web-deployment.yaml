@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+data:
+  VITE_API_URL: "http://localhost/api"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 1  # ✅ Réduit à 1 replica pour économiser les ressources
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: suivi-candidature-web:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5173
+          name: http
+        env:
+        - name: VITE_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: web-config
+              key: VITE_API_URL
+        # ✅ DÉSACTIVATION TEMPORAIRE DES PROBES
+        # On les réactivera une fois que ça fonctionne
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 5173
+        #   initialDelaySeconds: 90
+        #   periodSeconds: 30
+        #   timeoutSeconds: 15
+        #   failureThreshold: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 5173
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 20
+        #   timeoutSeconds: 10
+        #   failureThreshold: 10
+        resources:
+          requests:
+            memory: "256Mi"  # ✅ Doublé de 128Mi à 256Mi
+            cpu: "200m"      # ✅ Doublé de 100m à 200m
+          limits:
+            memory: "512Mi"  # ✅ Doublé de 256Mi à 512Mi
+            cpu: "500m"      # ✅ Augmenté de 200m à 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+  ports:
+  - port: 5173
+    targetPort: 5173
+  type: ClusterIP
