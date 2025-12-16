@@ -544,5 +544,6 @@ kubectl port-forward service/nginx 8080:80
 ## 📞 Support
 
 Pour toute question ou problème :
-1. Consultez les logs avec `docker-compose logs` ou `kubectl logs`
-2. Contactez-moi directement
+1. Regarder la section `Dépannage`
+2. Consultez les logs avec `docker-compose logs` ou `kubectl logs`
+3. Contactez-moi directement
