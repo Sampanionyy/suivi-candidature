@@ -1,151 +1,191 @@
 #!/bin/bash
 
-# Script de déploiement Kubernetes - Suivi Candidature
-# ================================================
-
-set -e  # Arrêter en cas d'erreur
-
-echo "🚀 Déploiement de l'application Suivi Candidature sur Kubernetes..."
+echo "🚀 Début du déploiement de l'application..."
 
 # Couleurs pour les messages
+RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Fonction pour afficher les messages
-print_step() {
-    echo -e "${GREEN}[ÉTAPE]${NC} $1"
+log_info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
 }
 
-print_warning() {
-    echo -e "${YELLOW}[ATTENTION]${NC} $1"
+log_warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
-print_error() {
-    echo -e "${RED}[ERREUR]${NC} $1"
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# 1. Vérifier que les images Docker existent
-print_step "Vérification des images Docker..."
-if ! docker images | grep -q "suivi-candidature-api"; then
-    print_error "L'image 'suivi-candidature-api:latest' n'existe pas. Construisez-la d'abord avec Docker."
+log_step() {
+    echo -e "${BLUE}[STEP]${NC} $1"
+}
+
+# Fonction pour vérifier si une commande existe
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Vérification des prérequis
+log_step "Vérification des prérequis..."
+if ! command_exists kubectl; then
+    log_error "kubectl n'est pas installé !"
     exit 1
 fi
 
-if ! docker images | grep -q "suivi-candidature-web"; then
-    print_error "L'image 'suivi-candidature-web:latest' n'existe pas. Construisez-la d'abord avec Docker."
+if ! command_exists docker; then
+    log_error "docker n'est pas installé !"
     exit 1
 fi
 
-print_step "✅ Images Docker trouvées"
+log_info "Tous les outils nécessaires sont installés ✓"
 
-# 2. Nettoyer les déploiements existants (optionnel)
-read -p "Voulez-vous nettoyer les déploiements existants? (y/N) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_step "Nettoyage des déploiements existants..."
-    kubectl delete -f k8s/nginx-deployment.yaml --ignore-not-found=true
-    kubectl delete -f k8s/web-deployment.yaml --ignore-not-found=true
-    kubectl delete -f k8s/api-deployment.yaml --ignore-not-found=true
-    kubectl delete -f k8s/mysql-deployment.yaml --ignore-not-found=true
-    sleep 5
-fi
+# 1. Construction des images Docker
+log_step "Construction des images Docker..."
 
-# 3. Déployer MySQL
-print_step "Déploiement de MySQL..."
-kubectl apply -f k8s/mysql-deployment.yaml
-
-# 4. Attendre que MySQL soit prêt
-print_step "Attente que MySQL soit prêt (peut prendre jusqu'à 2 minutes)..."
-kubectl wait --for=condition=ready pod -l app=mysql --timeout=120s || {
-    print_error "MySQL n'est pas devenu prêt à temps"
-    print_warning "Vérifiez les logs avec: kubectl logs -l app=mysql"
-    exit 1
-}
-
-print_step "✅ MySQL est prêt"
-
-# 5. Déployer l'API (avec le Job de migration)
-print_step "Déploiement de l'API et exécution des migrations..."
-kubectl apply -f k8s/api-deployment.yaml
-
-# 6. Attendre la fin du job de migration
-print_step "Attente de la fin des migrations (peut prendre jusqu'à 2 minutes)..."
-kubectl wait --for=condition=complete job/laravel-migration --timeout=120s || {
-    print_error "Le job de migration a échoué ou a dépassé le délai"
-    print_warning "Vérifiez les logs avec: kubectl logs job/laravel-migration"
-    exit 1
-}
-
-print_step "✅ Migrations terminées avec succès"
-
-# 7. Attendre que l'API soit prête
-print_step "Attente que l'API soit prête..."
-kubectl wait --for=condition=ready pod -l app=api --timeout=120s || {
-    print_error "L'API n'est pas devenue prête à temps"
-    print_warning "Vérifiez les logs avec: kubectl logs -l app=api"
-    exit 1
-}
-
-print_step "✅ API prête"
-
-# 8. Déployer le frontend Web
-print_step "Déploiement du frontend Web..."
-kubectl apply -f k8s/web-deployment.yaml
-
-# 9. Attendre que le Web soit prêt
-print_step "Attente que le frontend soit prêt..."
-kubectl wait --for=condition=ready pod -l app=web --timeout=120s || {
-    print_error "Le frontend n'est pas devenu prêt à temps"
-    print_warning "Vérifiez les logs avec: kubectl logs -l app=web"
-    exit 1
-}
-
-print_step "✅ Frontend prêt"
-
-# 10. Déployer Nginx
-print_step "Déploiement de Nginx (reverse proxy)..."
-kubectl apply -f k8s/nginx-deployment.yaml
-
-# 11. Attendre que Nginx soit prêt
-print_step "Attente que Nginx soit prêt..."
-kubectl wait --for=condition=ready pod -l app=nginx --timeout=120s || {
-    print_error "Nginx n'est pas devenu prêt à temps"
-    print_warning "Vérifiez les logs avec: kubectl logs -l app=nginx"
-    exit 1
-}
-
-print_step "✅ Nginx prêt"
-
-# 12. Afficher les informations de connexion
-echo ""
-echo "=========================================="
-echo "🎉 Déploiement terminé avec succès! 🎉"
-echo "=========================================="
-echo ""
-
-# Récupérer l'URL d'accès
-print_step "Récupération de l'URL d'accès..."
-if command -v minikube &> /dev/null; then
-    echo "Pour accéder à l'application sur Minikube:"
-    echo "  minikube service nginx --url"
-    echo ""
-    echo "Ou exécutez: minikube service nginx"
+# Image API
+log_info "Construction de l'image API..."
+if [ -d "api" ]; then
+    cd api
+    docker build -t suivi-candidature-api:latest . || { log_error "Échec de la construction de l'image API"; exit 1; }
+    cd ..
+    log_info "Image API construite avec succès ✓"
 else
-    kubectl get service nginx
-    echo ""
-    echo "Attendez que le LoadBalancer obtienne une EXTERNAL-IP"
-    echo "Puis accédez à: http://<EXTERNAL-IP>"
+    log_error "Le dossier 'api' n'existe pas !"
+    exit 1
 fi
 
+# Image Web
+log_info "Construction de l'image Web..."
+if [ -d "web" ]; then
+    cd web
+    docker build -t suivi-candidature-web:latest . || { log_error "Échec de la construction de l'image Web"; exit 1; }
+    cd ..
+    log_info "Image Web construite avec succès ✓"
+else
+    log_error "Le dossier 'web' n'existe pas !"
+    exit 1
+fi
+
+# 2. Chargement des images dans Minikube (si utilisé)
+if command_exists minikube; then
+    log_step "Détection de Minikube..."
+    if minikube status >/dev/null 2>&1; then
+        log_info "Chargement des images dans Minikube..."
+        minikube image load suivi-candidature-api:latest
+        minikube image load suivi-candidature-web:latest
+        log_info "Images chargées dans Minikube ✓"
+    else
+        log_warn "Minikube n'est pas démarré, utilisation du registry Docker local"
+    fi
+fi
+
+# 3. Déploiement de MySQL
+log_step "Déploiement de MySQL..."
+kubectl apply -f k8s/mysql-deployment.yaml || { log_error "Échec du déploiement MySQL"; exit 1; }
+log_info "MySQL déployé ✓"
+
+# Attendre que MySQL soit prêt
+log_info "Attente du démarrage de MySQL (30 secondes)..."
+sleep 30
+
+# 4. Déploiement de l'API
+log_step "Déploiement de l'API..."
+kubectl apply -f k8s/api-deployment.yaml || { log_error "Échec du déploiement API"; exit 1; }
+log_info "API déployée ✓"
+
+# Attendre que le job de migration soit terminé
+log_info "Attente de la fin des migrations..."
+kubectl wait --for=condition=complete --timeout=120s job/laravel-migration 2>/dev/null || log_warn "Timeout sur les migrations, vérifiez les logs"
+
+# Attendre que l'API soit prête
+log_info "Attente du démarrage de l'API (60 secondes)..."
+sleep 60
+
+# 5. Déploiement du Frontend Web
+log_step "Déploiement du Frontend Web..."
+kubectl apply -f k8s/web-deployment.yaml || { log_error "Échec du déploiement Web"; exit 1; }
+log_info "Frontend Web déployé ✓"
+
+# 6. Déploiement de Nginx
+log_step "Déploiement de Nginx..."
+kubectl apply -f k8s/nginx-deployment.yaml || { log_error "Échec du déploiement Nginx"; exit 1; }
+log_info "Nginx déployé ✓"
+
+# 7. Attendre que tous les pods soient prêts
+log_step "Attente du démarrage de tous les services..."
+log_info "Cela peut prendre quelques minutes..."
+
+# Fonction pour vérifier l'état des pods
+check_pods_status() {
+    local ready_count=$(kubectl get pods --no-headers 2>/dev/null | grep -c "Running")
+    local total_count=$(kubectl get pods --no-headers 2>/dev/null | wc -l)
+    echo "$ready_count/$total_count pods en cours d'exécution"
+}
+
+# Attendre 90 secondes avec affichage de la progression
+for i in {1..18}; do
+    echo -ne "\rProgression : $((i*5))% - $(check_pods_status)"
+    sleep 5
+done
 echo ""
-print_step "Commandes utiles:"
-echo "  - Voir tous les pods:           kubectl get pods"
-echo "  - Voir tous les services:       kubectl get services"
-echo "  - Voir les logs de l'API:       kubectl logs -l app=api -f"
-echo "  - Voir les logs du frontend:    kubectl logs -l app=web -f"
-echo "  - Voir les logs de Nginx:       kubectl logs -l app=nginx -f"
-echo "  - Voir les logs de MySQL:       kubectl logs -l app=mysql -f"
-echo "  - Supprimer tout:               kubectl delete -f k8s/."
+
+# 8. Affichage de l'état final
+log_step "État du déploiement :"
 echo ""
+echo "📊 Pods :"
+kubectl get pods
+echo ""
+echo "🌐 Services :"
+kubectl get services
+echo ""
+echo "💾 PVC :"
+kubectl get pvc
+
+# 9. Récupération de l'URL d'accès
+log_step "Récupération de l'URL d'accès..."
+if command_exists minikube; then
+    if minikube status >/dev/null 2>&1; then
+        NGINX_URL=$(minikube service nginx --url)
+        log_info "URL d'accès : $NGINX_URL"
+        echo ""
+        echo "🎉 Déploiement terminé avec succès !"
+        echo ""
+        echo "📝 Pour accéder à l'application :"
+        echo "   $NGINX_URL"
+        echo ""
+    else
+        log_warn "Impossible de récupérer l'URL, Minikube n'est pas démarré"
+    fi
+else
+    NGINX_PORT=$(kubectl get service nginx -o jsonpath='{.spec.ports[0].nodePort}' 2>/dev/null)
+    if [ -n "$NGINX_PORT" ]; then
+        log_info "Port Nginx : $NGINX_PORT"
+        echo ""
+        echo "🎉 Déploiement terminé avec succès !"
+        echo ""
+        echo "📝 Pour accéder à l'application :"
+        echo "   http://localhost:$NGINX_PORT"
+        echo ""
+    else
+        log_warn "Impossible de récupérer le port d'accès"
+    fi
+fi
+
+echo "💡 Commandes utiles :"
+echo "   - Voir les logs de l'API     : kubectl logs -f deployment/api"
+echo "   - Voir les logs du Web       : kubectl logs -f deployment/web"
+echo "   - Voir les logs de MySQL     : kubectl logs -f deployment/mysql"
+echo "   - Voir les logs de Nginx     : kubectl logs -f deployment/nginx"
+echo "   - Voir tous les pods         : kubectl get pods"
+echo "   - Nettoyer le déploiement    : ./cleanup.sh"
+echo ""
+echo "🔍 Pour déboguer les problèmes :"
+echo "   - kubectl describe pod <pod-name>"
+echo "   - kubectl logs <pod-name>"
+echo "   - kubectl get events --sort-by='.lastTimestamp'"

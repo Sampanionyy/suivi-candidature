@@ -15,12 +15,47 @@ data:
         sendfile        on;
         keepalive_timeout  65;
         
+        # Augmenter les tailles de buffer
+        client_max_body_size 10M;
+        
         server {
             listen 80;
             server_name localhost;
             
+            # IMPORTANT: Servir les photos de profil depuis le PVC partagé
+            location /storage/profile_photos/ {
+                alias /shared-storage/profile_photos/;
+                
+                # Headers CORS
+                add_header Access-Control-Allow-Origin * always;
+                add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+                add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept" always;
+                
+                # Cache
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+                
+                # Types MIME pour les images
+                types {
+                    image/jpeg jpg jpeg;
+                    image/png png;
+                    image/gif gif;
+                    image/webp webp;
+                }
+                
+                # Logs pour debug
+                access_log /var/log/nginx/storage_access.log;
+                error_log /var/log/nginx/storage_error.log debug;
+                
+                # Autoindex pour debug (à retirer en production)
+                autoindex on;
+            }
+            
+            # Pour les autres fichiers storage (CV, lettres de motivation, etc.)
             location /storage/ {
-                alias /var/www/storage/;
+                alias /shared-storage/;
+                
+                add_header Access-Control-Allow-Origin * always;
                 expires 1y;
                 add_header Cache-Control "public, immutable";
                 
@@ -30,6 +65,7 @@ data:
                 }
             }
             
+            # Frontend React
             location / {
                 proxy_pass http://web:5173;
                 proxy_http_version 1.1;
@@ -42,12 +78,18 @@ data:
                 proxy_cache_bypass $http_upgrade;
             }
             
+            # API Laravel
             location /api/ {
                 proxy_pass http://api:8080;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto $scheme;
+                
+                # Augmenter les timeouts pour les uploads
+                proxy_connect_timeout 300s;
+                proxy_send_timeout 300s;
+                proxy_read_timeout 300s;
             }
         }
     }
@@ -59,7 +101,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 2
+  replicas: 1  # 1 replica suffit pour Nginx
   selector:
     matchLabels:
       app: nginx
@@ -80,7 +122,7 @@ spec:
           subPath: nginx.conf
           readOnly: true
         - name: storage
-          mountPath: /var/www/storage
+          mountPath: /shared-storage
           readOnly: true
         livenessProbe:
           httpGet:
