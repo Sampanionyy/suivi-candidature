@@ -42,6 +42,8 @@ services:
             - DB_PASSWORD=123456789
             - APP_ENV=production
             - APP_DEBUG=false
+        ports:
+            - "8080:80" 
         entrypoint: >
             sh -c "
             php artisan config:clear &&
