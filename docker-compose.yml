@@ -22,6 +22,23 @@ services:
             timeout: 3s
             retries: 10
 
+    redis:
+        image: redis:7-alpine
+        container_name: suivi_candidature_redis
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        networks:
+            - suivi_candidature_network
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
+        command: redis-server --appendonly yes
+
     api:
         build:
             context: ./api
@@ -40,6 +57,12 @@ services:
             - DB_DATABASE=suivi_candidature_db
             - DB_USERNAME=suivi_candidature_user
             - DB_PASSWORD=123456789
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_PASSWORD=null
+            - CACHE_DRIVER=redis
+            - SESSION_DRIVER=redis
+            - QUEUE_CONNECTION=redis
             - APP_ENV=production
             - APP_DEBUG=false
         ports:
@@ -55,6 +78,80 @@ services:
             "
         depends_on:
             mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - suivi_candidature_network
+
+    scheduler:
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        container_name: suivi_candidature_scheduler
+        restart: unless-stopped
+        volumes:
+            - ./api:/var/www/html
+            - /var/www/html/vendor
+        environment:
+            - DB_CONNECTION=mysql
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=suivi_candidature_db
+            - DB_USERNAME=suivi_candidature_user
+            - DB_PASSWORD=123456789
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_PASSWORD=null
+            - CACHE_DRIVER=redis
+            - SESSION_DRIVER=redis
+            - QUEUE_CONNECTION=redis
+            - APP_ENV=production
+            - APP_DEBUG=false
+        command: >
+            sh -c "
+            while true; do
+                php artisan schedule:run --verbose --no-interaction &
+                sleep 60
+            done
+            "
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - suivi_candidature_network
+
+    queue:
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        container_name: suivi_candidature_queue
+        restart: unless-stopped
+        volumes:
+            - ./api:/var/www/html
+            - /var/www/html/vendor
+        environment:
+            - DB_CONNECTION=mysql
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=suivi_candidature_db
+            - DB_USERNAME=suivi_candidature_user
+            - DB_PASSWORD=123456789
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_PASSWORD=null
+            - CACHE_DRIVER=redis
+            - SESSION_DRIVER=redis
+            - QUEUE_CONNECTION=redis
+            - APP_ENV=production
+            - APP_DEBUG=false
+        command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
                 condition: service_healthy
         networks:
             - suivi_candidature_network
@@ -90,6 +187,7 @@ services:
 
 volumes:
     mysql_data:
+    redis_data:
     storage_data:
 
 networks:
