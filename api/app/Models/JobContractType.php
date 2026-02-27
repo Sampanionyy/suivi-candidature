@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class JobContractType extends Model
+{
+    use HasFactory;
+    protected $fillable = ['name'];
+
+    public function profiles()
+    {
+        return $this->belongsToMany(Profile::class, 'job_contract_type_profile');
+    }
+
+    public function offers()
+    {
+        return $this->hasMany(Offer::class, 'job_contract_type_id');
+    }
+}
