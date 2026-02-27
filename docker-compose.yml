@@ -17,7 +17,7 @@ services:
         networks:
             - suivi_candidature_network
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
             interval: 5s
             timeout: 3s
             retries: 10
@@ -33,7 +33,7 @@ services:
         networks:
             - suivi_candidature_network
         healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
+            test: [ "CMD", "redis-cli", "ping" ]
             interval: 5s
             timeout: 3s
             retries: 10
@@ -47,8 +47,8 @@ services:
         restart: unless-stopped
         volumes:
             - ./api:/var/www/html
-            - /var/www/html/vendor          
-            - /var/www/html/bootstrap/cache  
+            - /var/www/html/vendor
+            - /var/www/html/bootstrap/cache
             - storage_data:/var/www/html/storage/app/public
         environment:
             - DB_CONNECTION=mysql
@@ -66,16 +66,9 @@ services:
             - APP_ENV=production
             - APP_DEBUG=false
         ports:
-            - "8080:80" 
+            - "8080:80"
         entrypoint: >
-            sh -c "
-            php artisan config:clear &&
-            php artisan route:clear &&
-            php artisan view:clear &&
-            php artisan storage:link --force &&
-            php artisan migrate --force &&
-            apache2-foreground
-            "
+            sh -c " php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan storage:link --force && php artisan migrate --force && apache2-foreground "
         depends_on:
             mysql:
                 condition: service_healthy
@@ -109,12 +102,10 @@ services:
             - APP_ENV=production
             - APP_DEBUG=false
         command: >
-            sh -c "
-            while true; do
+            sh -c " while true; do
                 php artisan schedule:run --verbose --no-interaction &
                 sleep 60
-            done
-            "
+            done "
         depends_on:
             mysql:
                 condition: service_healthy
@@ -156,6 +147,49 @@ services:
         networks:
             - suivi_candidature_network
 
+    reverb:
+      build:
+          context: ./api
+          dockerfile: Dockerfile
+      container_name: suivi_candidature_reverb
+      restart: unless-stopped
+      volumes:
+          - ./api:/var/www/html
+          - /var/www/html/vendor
+      environment:
+          - DB_CONNECTION=mysql
+          - DB_HOST=mysql
+          - DB_PORT=3306
+          - DB_DATABASE=suivi_candidature_db
+          - DB_USERNAME=suivi_candidature_user
+          - DB_PASSWORD=123456789
+          - REDIS_HOST=redis
+          - REDIS_PORT=6379
+          - REDIS_PASSWORD=null
+          - CACHE_DRIVER=redis
+          - SESSION_DRIVER=redis
+          - QUEUE_CONNECTION=redis
+          - APP_ENV=production
+          - APP_DEBUG=false
+          - REVERB_SERVER_HOST=0.0.0.0
+          - REVERB_SERVER_PORT=6001
+      ports:
+          - "6001:6001"
+      command: >
+          sh -c "
+          composer require laravel/reverb --no-interaction &&
+          php artisan reverb:install --no-interaction || true &&
+          php artisan reverb:start --host=0.0.0.0 --port=6001
+          "
+      depends_on:
+          mysql:
+              condition: service_healthy
+          redis:
+              condition: service_healthy
+      networks:
+          - suivi_candidature_network
+
+    
     web:
         build:
             context: ./web
@@ -189,6 +223,7 @@ volumes:
     mysql_data:
     redis_data:
     storage_data:
+
 
 networks:
     suivi_candidature_network:
