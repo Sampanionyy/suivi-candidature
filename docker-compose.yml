@@ -1,5 +1,24 @@
 version: '3.8'
 
+x-api-common: &api-common
+    build:
+        context: ./api
+        dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+        - ./api:/var/www/html
+        - /var/www/html/vendor
+        - /var/www/html/bootstrap/cache
+    env_file:
+        - ./api/.env
+    depends_on:
+        mysql:
+            condition: service_healthy
+        redis:
+            condition: service_healthy
+    networks:
+        - suivi_candidature_network
+
 services:
     mysql:
         image: mysql:8.0
@@ -10,14 +29,12 @@ services:
             MYSQL_DATABASE: suivi_candidature_db
             MYSQL_USER: suivi_candidature_user
             MYSQL_PASSWORD: 123456789
-        ports:
-            - "3307:3306"
         volumes:
             - mysql_data:/var/lib/mysql
         networks:
             - suivi_candidature_network
         healthcheck:
-            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
             interval: 5s
             timeout: 3s
             retries: 10
@@ -26,170 +43,60 @@ services:
         image: redis:7-alpine
         container_name: suivi_candidature_redis
         restart: unless-stopped
-        ports:
-            - "6379:6379"
         volumes:
             - redis_data:/data
         networks:
             - suivi_candidature_network
         healthcheck:
-            test: [ "CMD", "redis-cli", "ping" ]
+            test: ["CMD", "redis-cli", "ping"]
             interval: 5s
             timeout: 3s
             retries: 10
         command: redis-server --appendonly yes
 
     api:
-        build:
-            context: ./api
-            dockerfile: Dockerfile
+        <<: *api-common
         container_name: suivi_candidature_api
-        restart: unless-stopped
         volumes:
             - ./api:/var/www/html
             - /var/www/html/vendor
             - /var/www/html/bootstrap/cache
             - storage_data:/var/www/html/storage/app/public
-        environment:
-            - DB_CONNECTION=mysql
-            - DB_HOST=mysql
-            - DB_PORT=3306
-            - DB_DATABASE=suivi_candidature_db
-            - DB_USERNAME=suivi_candidature_user
-            - DB_PASSWORD=123456789
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - REDIS_PASSWORD=null
-            - CACHE_DRIVER=redis
-            - SESSION_DRIVER=redis
-            - QUEUE_CONNECTION=redis
-            - APP_ENV=production
-            - APP_DEBUG=false
-        ports:
-            - "8080:80"
         entrypoint: >
-            sh -c " php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan storage:link --force && php artisan migrate --force && apache2-foreground "
-        depends_on:
-            mysql:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
+            sh -c "
+                php artisan config:clear &&
+                php artisan route:clear &&
+                php artisan view:clear &&
+                php artisan storage:link --force &&
+                php artisan migrate --force &&
+                apache2-foreground
+            "
         networks:
             - suivi_candidature_network
 
     scheduler:
-        build:
-            context: ./api
-            dockerfile: Dockerfile
+        <<: *api-common
         container_name: suivi_candidature_scheduler
-        restart: unless-stopped
-        volumes:
-            - ./api:/var/www/html
-            - /var/www/html/vendor
-        environment:
-            - DB_CONNECTION=mysql
-            - DB_HOST=mysql
-            - DB_PORT=3306
-            - DB_DATABASE=suivi_candidature_db
-            - DB_USERNAME=suivi_candidature_user
-            - DB_PASSWORD=123456789
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - REDIS_PASSWORD=null
-            - CACHE_DRIVER=redis
-            - SESSION_DRIVER=redis
-            - QUEUE_CONNECTION=redis
-            - APP_ENV=production
-            - APP_DEBUG=false
         command: >
-            sh -c " while true; do
-                php artisan schedule:run --verbose --no-interaction &
-                sleep 60
-            done "
-        depends_on:
-            mysql:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
-        networks:
-            - suivi_candidature_network
+            sh -c "
+                while true; do
+                    php artisan schedule:run --verbose --no-interaction &
+                    sleep 60
+                done
+            "
 
     queue:
-        build:
-            context: ./api
-            dockerfile: Dockerfile
+        <<: *api-common
         container_name: suivi_candidature_queue
-        restart: unless-stopped
-        volumes:
-            - ./api:/var/www/html
-            - /var/www/html/vendor
-        environment:
-            - DB_CONNECTION=mysql
-            - DB_HOST=mysql
-            - DB_PORT=3306
-            - DB_DATABASE=suivi_candidature_db
-            - DB_USERNAME=suivi_candidature_user
-            - DB_PASSWORD=123456789
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
-            - REDIS_PASSWORD=null
-            - CACHE_DRIVER=redis
-            - SESSION_DRIVER=redis
-            - QUEUE_CONNECTION=redis
-            - APP_ENV=production
-            - APP_DEBUG=false
         command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
-        depends_on:
-            mysql:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
-        networks:
-            - suivi_candidature_network
 
     reverb:
-      build:
-          context: ./api
-          dockerfile: Dockerfile
-      container_name: suivi_candidature_reverb
-      restart: unless-stopped
-      volumes:
-          - ./api:/var/www/html
-          - /var/www/html/vendor
-      environment:
-          - DB_CONNECTION=mysql
-          - DB_HOST=mysql
-          - DB_PORT=3306
-          - DB_DATABASE=suivi_candidature_db
-          - DB_USERNAME=suivi_candidature_user
-          - DB_PASSWORD=123456789
-          - REDIS_HOST=redis
-          - REDIS_PORT=6379
-          - REDIS_PASSWORD=null
-          - CACHE_DRIVER=redis
-          - SESSION_DRIVER=redis
-          - QUEUE_CONNECTION=redis
-          - APP_ENV=production
-          - APP_DEBUG=false
-          - REVERB_SERVER_HOST=0.0.0.0
-          - REVERB_SERVER_PORT=6001
-      ports:
-          - "6001:6001"
-      command: >
-          sh -c "
-          composer require laravel/reverb --no-interaction &&
-          php artisan reverb:install --no-interaction || true &&
-          php artisan reverb:start --host=0.0.0.0 --port=6001
-          "
-      depends_on:
-          mysql:
-              condition: service_healthy
-          redis:
-              condition: service_healthy
-      networks:
-          - suivi_candidature_network
+        <<: *api-common
+        container_name: suivi_candidature_reverb
+        ports:
+            - "6001:6001"
+        command: php artisan reverb:start --host=0.0.0.0 --port=6001
 
-    
     web:
         build:
             context: ./web
@@ -199,8 +106,8 @@ services:
         volumes:
             - ./web:/app
             - /app/node_modules
-        environment:
-            - VITE_API_URL=http://localhost/api
+        env_file:
+            - ./web/.env
         networks:
             - suivi_candidature_network
 
@@ -223,7 +130,6 @@ volumes:
     mysql_data:
     redis_data:
     storage_data:
-
 
 networks:
     suivi_candidature_network:
