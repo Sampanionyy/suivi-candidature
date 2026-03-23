@@ -1,15 +1,25 @@
 import type { INotification } from '../../../interfaces/types';
 import { timeAgo } from '../../../utils/notification.utils';
 import styles from '../../../../public/style/notification.module.css';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     notification: INotification;
     onMarkAsRead: (id: string) => void;
 }
 
+
 export function NotificationItem({ notification, onMarkAsRead }: Props) {
     const { id, data, read_at, created_at } = notification;
     const isUnread = !read_at;
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        if (isUnread) onMarkAsRead(id);
+        if (data?.application_id) {
+            navigate(`/applications?highlight=${data.application_id}`);
+        }
+    };
 
     const title = data?.titre ?? data?.position ?? 'Notification';
     const initial = title.charAt(0).toUpperCase();
@@ -17,10 +27,10 @@ export function NotificationItem({ notification, onMarkAsRead }: Props) {
     return (
         <div
             className={`${styles.item} ${isUnread ? styles.itemUnread : styles.itemRead}`}
-            onClick={() => isUnread && onMarkAsRead(id)}
-            role={isUnread ? 'button' : undefined}
-            tabIndex={isUnread ? 0 : undefined}
-            onKeyDown={e => isUnread && e.key === 'Enter' && onMarkAsRead(id)}
+            onClick={handleClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && handleClick()}
         >
             <div className={styles.avatar} aria-hidden>{initial}</div>
             <div className={styles.body}>
