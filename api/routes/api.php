@@ -26,13 +26,14 @@ Route::prefix('auth')->group(function () {
 
 Route::get('/health', [HealthController::class, 'check']);
 
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
+
 // ==========================================
 // Routes protégées (avec authentification)
 // ==========================================
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/broadcasting/auth', function (Request $request) {
-        return Broadcast::auth($request);
-    });
+
     // Auth user
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);

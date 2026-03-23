@@ -29,7 +29,7 @@ class SendInterviewReminders extends Command
      */
     public function handle()
     {
-        $this->info('🔍 Recherche des entretiens à venir...');
+        $this->info('Recherche des entretiens à venir...');
 
         // Définir les jours par défaut ou utiliser ceux spécifiés
         $days = $this->option('days') ?: [1, 2, 3];
@@ -53,7 +53,7 @@ class SendInterviewReminders extends Command
     {
         $targetDate = Carbon::now()->addDays($dayCount);
         
-        $this->line("\n📅 Entretiens dans {$dayCount} jour(s) ({$targetDate->format('d/m/Y')}) :");
+        $this->line("\nEntretiens dans {$dayCount} jour(s) ({$targetDate->format('d/m/Y')}) :");
 
         $applications = Application::where('status', 'interview')
             ->whereDate('interview_date', $targetDate->toDateString())
@@ -61,11 +61,11 @@ class SendInterviewReminders extends Command
             ->get();
 
         if ($applications->isEmpty()) {
-            $this->line("   ✅ Aucun entretien trouvé");
+            $this->line("   Aucun entretien trouvé");
             return;
         }
 
-        $this->line("   📧 {$applications->count()} rappel(s) à envoyer...");
+        $this->line("   {$applications->count()} rappel(s) à envoyer...");
 
         $sent = 0;
         $errors = 0;
@@ -76,11 +76,11 @@ class SendInterviewReminders extends Command
                 Mail::to($application->user->email)
                     ->send(new InterviewReminder($application, $dayCount));
                 
-                $this->line("   ✉️  Rappel envoyé à {$application->user->name} pour {$application->company}");
+                $this->line("   Rappel envoyé à {$application->user->name} pour {$application->company}");
                 $sent++;
                 
             } catch (\Exception $e) {
-                $this->error("   ❌ Erreur pour {$application->user->name}: " . $e->getMessage());
+                $this->error("   Erreur pour {$application->user->name}: " . $e->getMessage());
                 $errors++;
             }
         }
@@ -88,7 +88,7 @@ class SendInterviewReminders extends Command
         $totalSent += $sent;
         $totalErrors += $errors;
 
-        $this->line("   📊 Résultat : {$sent} envoyé(s)" . ($errors > 0 ? ", {$errors} erreur(s)" : ""));
+        $this->line("   Résultat : {$sent} envoyé(s)" . ($errors > 0 ? ", {$errors} erreur(s)" : ""));
     }
 
     /**
@@ -97,7 +97,7 @@ class SendInterviewReminders extends Command
     private function displaySummary(int $totalSent, int $totalErrors): void
     {
         $this->info("\n" . str_repeat("=", 50));
-        $this->info("📈 RÉSUMÉ GLOBAL :");
+        $this->info("RÉSUMÉ GLOBAL :");
         $this->info("   • Total rappels envoyés : {$totalSent}");
         
         if ($totalErrors > 0) {

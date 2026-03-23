@@ -1,4 +1,4 @@
-import { User, LogOut, Home, UserCircle, Briefcase, BarChart3, Calendar, Menu, X, Bell } from "lucide-react"
+import { User, LogOut, Home, UserCircle, Briefcase, BarChart3, Calendar, Menu, X } from "lucide-react"
 import { Outlet, useLocation } from "react-router-dom"
 import type { ReactNode } from 'react'
 import { useUser } from "../contexts/UserContext"
@@ -12,21 +12,12 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {    
     const { user, logout } = useUser();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const location = useLocation();
     const currentPath = location.pathname;
 
-    const handleLogout = () => {
-        logout();
-    }
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    }
-
-    const closeSidebar = () => {
-        setIsSidebarOpen(false);
-    }
+    const handleLogout = () => logout();
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    const closeSidebar = () => setIsSidebarOpen(false);
 
     const navigationItems = [
         { href: "/dashboard", icon: Home, label: "Tableau de bord" },
@@ -38,10 +29,6 @@ export default function Layout({ children }: LayoutProps) {
     const filteredNavigation = navigationItems.filter(item => 
         !item.requiresAuth || (item.requiresAuth && user)
     )
-
-    const showNotifications = () => {
-        setIsNotificationsOpen(!isNotificationsOpen);
-    }
 
     return (
         <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -71,11 +58,7 @@ export default function Layout({ children }: LayoutProps) {
                             <p className="text-xs lg:text-sm text-gray-500 hidden sm:block">Suivi des candidatures</p>
                         </div>
                     </div>
-                    
-                    <button
-                        onClick={closeSidebar}
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
-                    >
+                    <button onClick={closeSidebar} className="lg:hidden p-2 rounded-lg hover:bg-gray-100">
                         <X className="w-5 h-5 text-gray-500" />
                     </button>
                 </div>
@@ -108,16 +91,20 @@ export default function Layout({ children }: LayoutProps) {
             </aside>
 
             <main className="flex-1 flex flex-col lg:ml-0">
-                <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 shadow-sm flex items-center">
+                {/*
+                    ✅ z-index: 40 sur le header pour passer au-dessus du contenu
+                    ✅ overflow-visible pour que le dropdown de notif dépasse vers le bas
+                    ✅ position: relative pour que z-index soit actif
+                */}
+                <header
+                    className="h-16 lg:h-20 bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 shadow-sm flex items-center"
+                    style={{ position: 'relative', zIndex: 40, overflow: 'visible' }}
+                >
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center space-x-3">
-                            <button
-                                onClick={toggleSidebar}
-                                className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
-                            >
+                            <button onClick={toggleSidebar} className="lg:hidden p-2 rounded-lg hover:bg-gray-100">
                                 <Menu className="w-5 h-5 text-gray-600" />
                             </button>
-                            
                             <div>
                                 {user ? (
                                     <>
@@ -140,7 +127,7 @@ export default function Layout({ children }: LayoutProps) {
                             </div>
                         </div>
                         
-                        <div className="flex items-center space-x-2 lg:space-x-4">                            
+                        <div className="flex items-center space-x-2 lg:space-x-4">
                             {user ? (
                                 <div className="flex items-center space-x-2 lg:space-x-3">
                                     <a 
@@ -150,14 +137,10 @@ export default function Layout({ children }: LayoutProps) {
                                         <UserCircle className="w-5 h-5" />
                                         <span className="font-medium hidden sm:inline">Profil</span>
                                     </a>
-                                    <span className="relative" onClick={showNotifications}>
-                                        <Bell className="w-5 h-5 text-gray-700 hover:text-fuchsia-600 transition-colors duration-200 cursor-pointer" />
-                                        {isNotificationsOpen && (
-                                            <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
-                                                <NotificationComponent />
-                                            </div>
-                                        )}
-                                    </span>
+
+                                    {/* ✅ NotificationComponent gère sa cloche + son dropdown en position:fixed */}
+                                    <NotificationComponent />
+
                                     <button
                                         onClick={handleLogout}
                                         className="flex items-center space-x-2 px-2 lg:px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
@@ -181,7 +164,11 @@ export default function Layout({ children }: LayoutProps) {
                     </div>
                 </header>
 
-                <div className="flex-1 p-4 lg:p-6 overflow-auto">
+                {/*
+                    ✅ position: relative + z-index: 0 sur le contenu
+                    → garantit que les graphiques/cartes passent SOUS le dropdown
+                */}
+                <div className="flex-1 p-4 lg:p-6 overflow-auto" style={{ position: 'relative', zIndex: 0 }}>
                     <div className="max-w-7xl mx-auto">
                         {children || <Outlet />}
                     </div>
