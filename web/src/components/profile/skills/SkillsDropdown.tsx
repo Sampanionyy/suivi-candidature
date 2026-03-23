@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import type { ISkillCategory } from '../../../interfaces/types';
-import { getCategoryById } from '../../../utils/preferences-helpers';
+import { getCategoryById } from '../../../utils/preferences.utils';
 
 interface SkillsDropdownProps {
     showDropdown: boolean;

@@ -12,7 +12,6 @@ import CalendarPage from "./pages/Calendar"
 import Profile from "./pages/Profile"
 import ProtectedRoute from "./components/ProtectedRoute"
 import AuthRedirect from "./components/AuthRedirect"
-import './echo';
 
 function App() {
     return (

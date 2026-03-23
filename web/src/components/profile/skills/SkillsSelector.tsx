@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SelectedSkills } from './SelectedSkills';
 import { SkillsDropdown } from './SkillsDropdown';
-import { useFilteredSkills } from '../../../hooks/use-filtered-skills';
+import { useFilteredSkills } from '../../../hooks/useFilteredSkills';
 
 interface SkillsSelectorProps {
     isEditingProfile: boolean;

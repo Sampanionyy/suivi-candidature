@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom"
 import type { ReactNode } from 'react'
 import { useUser } from "../contexts/UserContext"
 import { useState } from "react"
-import NotificationComponent from "./applications/Notification"
+import NotificationCenter from "./applications/notifications/NotificationCenter"
 
 interface LayoutProps {
     children?: ReactNode
@@ -139,7 +139,7 @@ export default function Layout({ children }: LayoutProps) {
                                     </a>
 
                                     {/* ✅ NotificationComponent gère sa cloche + son dropdown en position:fixed */}
-                                    <NotificationComponent />
+                                    <NotificationCenter />
 
                                     <button
                                         onClick={handleLogout}

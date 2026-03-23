@@ -103,10 +103,13 @@ class CheckFollowUps extends Command
     private function sendFollowUpNotification(Application $application): void
     {
         try {
-            // Marque comme "à relancer"
-            $application->update(['needs_follow_up' => true]);
+            // ✅ Marque EN PREMIER avant d'envoyer (évite les doublons si la queue est lente)
+            $application->update([
+                'needs_follow_up' => true,
+                'last_follow_up_date' => now(),
+                'follow_up_count' => $application->follow_up_count + 1,
+            ]);
 
-            // Envoie la notification à l'utilisateur
             $application->user->notify(new FollowUpReminder($application));
 
         } catch (\Exception $e) {

@@ -10,7 +10,7 @@ Schedule::command('interviews:send-reminders')
     ->description('Rappels d\'entretien (TEST)');
 
 Schedule::command('applications:check-followups')
-    ->dailyAt('09:28')
+    ->dailyAt('11:48')
     ->timezone('Europe/Paris') 
     ->onSuccess(function () {
         info('✅ Vérification des relances effectuée avec succès');

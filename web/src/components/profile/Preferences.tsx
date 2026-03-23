@@ -5,8 +5,8 @@ import { WorkModeSelector } from './WorkModeSelector';
 import { ContractTypeSelector } from './ContractTypeSelector';
 import type { IProfile } from '../../interfaces/types';
 import type { useFormik } from 'formik';
-import { usePreferencesData } from '../../hooks/use-preferences-data';
-import { usePreferencesSelection } from '../../hooks/use-preferences-selection';
+import { usePreferencesData } from '../../hooks/usePreferencesData';
+import { usePreferencesSelection } from '../../hooks/usePreferencesSelection';
 
 interface PreferencesProps {
     isEditingProfile?: boolean;
