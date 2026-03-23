@@ -31,7 +31,7 @@ class CheckFollowUps extends Command
      */
     public function handle(): int
     {
-        $this->info('🔍 Vérification des candidatures à relancer...');
+        $this->info('Vérification des candidatures à relancer...');
         
         // Récupère les candidatures en attente de réponse
         $applications = Application::whereIn('status', ['applied', 'interview'])
@@ -47,21 +47,21 @@ class CheckFollowUps extends Command
         }
 
         if ($toFollowUp->isEmpty()) {
-            $this->info('✅ Aucune candidature à relancer pour le moment.');
+            $this->info('Aucune candidature à relancer pour le moment.');
             return Command::SUCCESS;
         }
 
-        $this->info("📬 {$toFollowUp->count()} candidature(s) à relancer trouvée(s).");
+        $this->info("{$toFollowUp->count()} candidature(s) à relancer trouvée(s).");
 
         // Envoie les notifications
         foreach ($toFollowUp as $application) {
             $this->sendFollowUpNotification($application);
             
-            $this->line("  → {$application->company} - {$application->position}");
+            $this->line("  -> {$application->company} - {$application->position}");
         }
 
         $this->newLine();
-        $this->info('✅ Notifications envoyées avec succès !');
+        $this->info('Notifications envoyées avec succès !');
 
         return Command::SUCCESS;
     }
@@ -103,10 +103,12 @@ class CheckFollowUps extends Command
     private function sendFollowUpNotification(Application $application): void
     {
         try {
-            // Marque comme "à relancer"
-            $application->update(['needs_follow_up' => true]);
+            $application->update([
+                'needs_follow_up' => true,
+                'last_follow_up_date' => now(),
+                'follow_up_count' => $application->follow_up_count + 1,
+            ]);
 
-            // Envoie la notification à l'utilisateur
             $application->user->notify(new FollowUpReminder($application));
 
         } catch (\Exception $e) {

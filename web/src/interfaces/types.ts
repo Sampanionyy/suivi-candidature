@@ -133,3 +133,39 @@ export interface ISkillProfile {
     profile?: IProfile;
     skill?: ISkill;
 }
+
+export interface INotificationData {
+    message: string;
+    titre?: string;
+    position?: string;
+    company?: string;
+    application_id?: number;
+    type?: string;
+    [key: string]: unknown;
+}
+
+export interface INotification {
+    id: string;
+    type: string;
+    data: INotificationData;
+    read_at: string | null;
+    created_at: string;
+}
+
+export interface INotificationGroup {
+    label: string;
+    items: INotification[];
+}
+
+export type TActiveTab = 'all' | 'unread';
+
+declare global {
+    interface Window {
+        Echo: {
+            private: (channel: string) => {
+                notification: (cb: (n: unknown) => void) => void;
+            };
+            leave: (channel: string) => void;
+        };
+    }
+}

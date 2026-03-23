@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import type { IWorkMode } from '../../interfaces/types';
-import { getWorkModeById } from '../../utils/preferences-helpers';
+import { getWorkModeById } from '../../utils/preferences.utils';
 
 interface WorkModeSelectorProps {
     isEditingProfile: boolean;

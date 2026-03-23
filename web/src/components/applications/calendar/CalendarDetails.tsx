@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { formatDate, getInterviewsForDate } from '../../../utils/date-utils';
+import { formatDate, getInterviewsForDate } from '../../../utils/date.utils';
 import type { Interview } from '../../../interfaces/types';
 import { setStatusName } from '../../../utils/utils';
 

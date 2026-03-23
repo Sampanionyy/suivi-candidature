@@ -1,7 +1,7 @@
 import React from 'react';
 import { Briefcase } from 'lucide-react';
 import type { IJobContractType } from '../../interfaces/types';
-import { getContractTypeById } from '../../utils/preferences-helpers';
+import { getContractTypeById } from '../../utils/preferences.utils';
 
 interface ContractTypeSelectorProps {
     isEditingProfile: boolean;

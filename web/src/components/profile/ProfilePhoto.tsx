@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { User, Camera, X } from 'lucide-react';
 import type { IProfile } from '../../interfaces/types';
-import { usePhotoUpload } from '../../hooks/use-photo-upload';
+import { usePhotoUpload } from '../../hooks/usePhotoUpload';
 
 interface ProfilePhotoProps {
     profile?: IProfile | null;

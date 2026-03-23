@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { getSkillById } from '../../../utils/preferences-helpers';
+import { getSkillById } from '../../../utils/preferences.utils';
 
 interface SelectedSkillsProps {
     selectedSkills: number[];

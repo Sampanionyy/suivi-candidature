@@ -1,6 +1,6 @@
 import React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getInterviewsForDate } from '../../../utils/date-utils';
+import { getInterviewsForDate } from '../../../utils/date.utils';
 import type { Interview } from '../../../interfaces/types';
 
 interface CalendarPrincipalProps {

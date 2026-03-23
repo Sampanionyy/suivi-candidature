@@ -34,7 +34,7 @@ services:
         networks:
             - suivi_candidature_network
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
             interval: 5s
             timeout: 3s
             retries: 10
@@ -48,7 +48,7 @@ services:
         networks:
             - suivi_candidature_network
         healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
+            test: [ "CMD", "redis-cli", "ping" ]
             interval: 5s
             timeout: 3s
             retries: 10
@@ -77,6 +77,7 @@ services:
     scheduler:
         <<: *api-common
         container_name: suivi_candidature_scheduler
+        entrypoint: []
         command: >
             sh -c "
                 while true; do
@@ -85,17 +86,29 @@ services:
                 done
             "
 
-    queue:
-        <<: *api-common
-        container_name: suivi_candidature_queue
-        command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
-
     reverb:
         <<: *api-common
         container_name: suivi_candidature_reverb
+        entrypoint: []
         ports:
             - "6001:6001"
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         command: php artisan reverb:start --host=0.0.0.0 --port=6001
+
+    queue:
+        <<: *api-common
+        container_name: suivi_candidature_queue
+        entrypoint: []
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
 
     web:
         build:
@@ -130,6 +143,7 @@ volumes:
     mysql_data:
     redis_data:
     storage_data:
+
 
 networks:
     suivi_candidature_network:
