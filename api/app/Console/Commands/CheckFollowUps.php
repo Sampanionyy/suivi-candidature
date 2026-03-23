@@ -103,7 +103,6 @@ class CheckFollowUps extends Command
     private function sendFollowUpNotification(Application $application): void
     {
         try {
-            // ✅ Marque EN PREMIER avant d'envoyer (évite les doublons si la queue est lente)
             $application->update([
                 'needs_follow_up' => true,
                 'last_follow_up_date' => now(),
