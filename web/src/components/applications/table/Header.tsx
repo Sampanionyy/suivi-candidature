@@ -1,20 +1,11 @@
 import { Briefcase, Plus } from 'lucide-react'
 import React from 'react'
 import FilterSection from '../FilterSection'
+import type { IFilterApp } from '../../../interfaces/types';
 
 interface HeaderProps {
-    filters: {
-        search: string
-        status: string
-        company: string
-        position: string
-    }
-    setFilters: React.Dispatch<React.SetStateAction<{
-        search: string
-        status: string
-        company: string
-        position: string
-    }>>
+    filters: IFilterApp,
+    setFilters: React.Dispatch<React.SetStateAction<IFilterApp>>,
     setIsAddingNew: React.Dispatch<React.SetStateAction<boolean>>
 }
 

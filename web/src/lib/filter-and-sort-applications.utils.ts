@@ -1,11 +1,4 @@
-import type { IApplication } from '../interfaces/types';
-
-interface Filters {
-    search: string;
-    status?: string;
-    company?: string;
-    position?: string;
-}
+import type { IApplication, IFilterApp } from '../interfaces/types';
 
 interface SortConfig {
     key: keyof IApplication;
@@ -14,34 +7,34 @@ interface SortConfig {
 
 export function filterAndSortApplications(
     applications: IApplication[],
-    filters: Filters,
+    filters: IFilterApp,
     sortConfig?: SortConfig
-): IApplication[] {
-    const searchLower = filters.search.toLowerCase();
+): IApplication[] {    
+    const searchLower = (filters && filters.search) ? filters.search.toLowerCase() : '';
 
     let filtered = applications.filter(app => {
 
         const matchesSearch =
             app.position.toLowerCase().includes(searchLower) ||
             app.company.toLowerCase().includes(searchLower) ||
-            (app.notes && app.notes.toLowerCase().includes(searchLower));
+            (app.contact_email?.toLowerCase().includes(searchLower) ?? false);
 
         const matchesStatus = !filters.status || app.status === filters.status;
         const matchesCompany = !filters.company || app.company.toLowerCase().includes(filters.company.toLowerCase());
         const matchesPosition = !filters.position || app.position.toLowerCase().includes(filters.position.toLowerCase());
+        const matchesContactEmail = !filters.contact_email || (app.contact_email?.toLowerCase().includes(filters.contact_email.toLowerCase()) ?? false);
 
-        return matchesSearch && matchesStatus && matchesCompany && matchesPosition;
+        return matchesSearch && matchesStatus && matchesCompany && matchesPosition && matchesContactEmail;
     });
 
-    if (sortConfig) {
+    if (sortConfig) {        
         filtered.sort((a, b) => {
             const aValue = a[sortConfig.key];
             const bValue = b[sortConfig.key];
-
+            
             if (aValue === null || aValue === undefined) return 1;
             if (bValue === null || bValue === undefined) return -1;
-
-            // Gestion des chaînes et des dates avec localeCompare
+            
             if (typeof aValue === 'string' && typeof bValue === 'string') {
                 return sortConfig.direction === 'asc'
                     ? aValue.localeCompare(bValue)

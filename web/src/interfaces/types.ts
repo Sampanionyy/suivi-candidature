@@ -183,3 +183,11 @@ export interface IApplicationNote {
 }
 
 export type Tab = "compose" | "history" | "notes";
+
+export interface IFilterApp {
+    search?: string;
+    status?: string;
+    company?: string;
+    position?: string;
+    contact_email?: string;
+}

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import apiClient from '../services/api.service';
 import { toast } from 'sonner';
-import type { IApplication } from '../interfaces/types';
+import type { IApplication, IFilterApp } from '../interfaces/types';
 import Header from '../components/applications/table/Header';
 import TableApp from '../components/applications/table/TableApp';
 import { filterAndSortApplications } from '../lib/filter-and-sort-applications.utils';
@@ -35,11 +35,12 @@ export default function ApplicationsTable() {
         fetchApplications();
     }, []);
 
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<IFilterApp>({
         search: '',
         status: '',
         company: '',
-        position: ''
+        position: '',
+        contact_email: '',
     });
 
     const [sortConfig, setSortConfig] = useState<{
@@ -51,13 +52,14 @@ export default function ApplicationsTable() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    const handleSort = (key: keyof IApplication) => {
+    const handleSort = (key: keyof IApplication) => {                
         setSortConfig(current => ({
             key,
             direction: current?.key === key && current.direction === 'asc' ? 'desc' : 'asc'
         }));
     };
 
+    
     const filteredAndSortedApplications = useMemo(
         () => filterAndSortApplications(applications, filters, sortConfig ?? undefined),
         [applications, filters, sortConfig]

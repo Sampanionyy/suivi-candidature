@@ -19,7 +19,7 @@ export default function Layout({ children }: LayoutProps) {
                     className="flex-1 p-4 lg:p-6 overflow-auto"
                     style={{ position: "relative", zIndex: 0 }}
                 >
-                    <div className="max-w-7xl mx-auto">
+                    <div className="max-w-8xl mx-auto">
                         {children || <Outlet />}
                     </div>
                 </div>
