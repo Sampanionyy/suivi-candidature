@@ -11,8 +11,6 @@ class FollowUpController extends Controller
 {
     /**
      * Liste toutes les candidatures nécessitant une relance
-     * 
-     * GET /api/applications/follow-ups
      */
     public function index(Request $request): JsonResponse
     {
@@ -45,8 +43,6 @@ class FollowUpController extends Controller
 
     /**
      * Marque qu'une relance a été envoyée pour une candidature
-     * 
-     * POST /api/applications/{id}/mark-follow-up-sent
      */
     public function markFollowUpSent(Request $request, Application $application): JsonResponse
     {
@@ -82,8 +78,6 @@ class FollowUpController extends Controller
 
     /**
      * Réinitialise le statut de relance (si besoin d'annuler)
-     * 
-     * POST /api/applications/{id}/reset-follow-up
      */
     public function resetFollowUp(Request $request, Application $application): JsonResponse
     {
@@ -108,8 +102,6 @@ class FollowUpController extends Controller
 
     /**
      * Force la vérification des relances (trigger manuel)
-     * 
-     * POST /api/applications/check-follow-ups
      */
     public function checkFollowUps(Request $request): JsonResponse
     {
@@ -133,8 +125,6 @@ class FollowUpController extends Controller
 
     /**
      * Récupère les statistiques de relance
-     * 
-     * GET /api/applications/follow-up-stats
      */
     public function stats(Request $request): JsonResponse
     {

@@ -112,7 +112,6 @@ class ApplicationController extends Controller
         }
 
         $data = $request->validated();
-
         if ($request->hasFile('cv_path')) {
             if ($application->cv_path) {
                 $oldPath = str_replace('/storage/', '', $application->cv_path);

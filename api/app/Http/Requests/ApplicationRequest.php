@@ -26,6 +26,7 @@ class ApplicationRequest extends FormRequest
             'cv_path' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], 
             'cover_letter_path' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
             'interview_date' => ['nullable', 'date', 'after:now'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
             'notes' => ['nullable', 'string', 'max:2000']
         ];
 

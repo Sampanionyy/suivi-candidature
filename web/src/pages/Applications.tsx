@@ -5,7 +5,7 @@ import type { IApplication } from '../interfaces/types';
 import Header from '../components/applications/table/Header';
 import TableApp from '../components/applications/table/TableApp';
 import { filterAndSortApplications } from '../lib/filter-and-sort-applications.utils';
-import TableFooterApp from '../components/applications/table/ResumeFooterApp';
+import ResumeFooterApp from '../components/applications/table/ResumeFooterApp';
 import { useUser } from '../contexts/UserContext';
 import { useApplicationForm } from '../hooks/useApplicationForm';
 import AppPagination from '../components/AppPagination';
@@ -80,6 +80,7 @@ export default function ApplicationsTable() {
 
     useEffect(() => {
         if (editingId && appToEdit) {
+            
             const formatDateForInput = (dateString: string | null | undefined): string => {
                 if (!dateString) return '';
                 return dateString.split(' ')[0].split('T')[0] || '';
@@ -166,7 +167,7 @@ export default function ApplicationsTable() {
                     />
 
                     {paginatedApplications.length > 0 && (
-                        <TableFooterApp
+                        <ResumeFooterApp
                             filteredAndSortedApplications={paginatedApplications}
                             applications={applications}
                         />

@@ -13,13 +13,13 @@ class FollowUpEmailMailable extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public readonly string $subject,
+        public readonly string $emailSubject,
         public readonly string $body,
     ) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: $this->subject);
+        return new Envelope(subject: $this->emailSubject);
     }
 
     public function content(): Content
