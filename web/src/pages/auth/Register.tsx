@@ -4,7 +4,7 @@ import * as yup from "yup";
 import { toast } from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { registerUser } from "../../services/auth-service";
+import { registerUser } from "../../services/auth.service";
 import FormRegister from "../../components/auth/FormRegister";
 
 type RegisterValues = {

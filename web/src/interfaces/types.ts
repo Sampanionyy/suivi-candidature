@@ -16,16 +16,15 @@ interface IApplicationBase {
     notes: string | null;
     created_at: string;
     updated_at: string;
+    contact_email: string | null;
 }
 
-// Stocke (depuis API)
 export interface IApplication extends IApplicationBase {
     id: number;
     cv_path: string | null;
     cover_letter_path: string | null;
 }
 
-// Envoies (formulaire avant upload)
 export interface IApplicationForm extends IApplicationBase {
     id: number;
     cv_path: File | null;
@@ -169,3 +168,18 @@ declare global {
         };
     }
 }
+
+export interface IFollowUpEmail {
+    id: number;
+    subject: string;
+    body: string;
+    sent_at: string;
+}
+
+export interface IApplicationNote {
+    id: number;
+    content: string;
+    created_at: string;
+}
+
+export type Tab = "compose" | "history" | "notes";

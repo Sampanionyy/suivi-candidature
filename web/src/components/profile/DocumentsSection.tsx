@@ -3,7 +3,7 @@ import { FileText, Plus, Trash2 } from 'lucide-react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'sonner';
-import apiClient from '../../services/api-service';
+import apiClient from '../../services/api.service';
 import type { IDocument, IProfile } from '../../interfaces/types';
 
 interface DocumentsSectionProps {

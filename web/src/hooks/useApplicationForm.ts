@@ -2,7 +2,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
 import type { IApplication, IApplicationForm } from "../interfaces/types";
-import { addApplication, updateApplication } from "../services/application-service";
+import { addApplication, updateApplication } from "../services/application.service";
 import { toast } from "sonner";
 
 const today = new Date();
@@ -46,6 +46,7 @@ export const useApplicationForm = (
             applied_date: initialApplication?.applied_date ?? new Date().toISOString().split("T")[0],
             status: initialApplication?.status ?? "applied",
             interview_date: initialApplication?.interview_date ?? undefined,
+            contact_email: initialApplication?.contact_email ?? '',
             notes: initialApplication?.notes ?? "",
             cv_path: null,
             cover_letter_path: null,
@@ -76,6 +77,7 @@ export const useApplicationForm = (
                         applied_date: values.applied_date ?? new Date().toISOString(),
                         status: values.status ?? "applied",
                         interview_date: values.interview_date ?? null,
+                        contact_email: values.contact_email ?? null,
                         notes: values.notes ?? "",
                         cv_path: result.data.data?.cv_path ?? values.cv_path ?? null,
                         cover_letter_path: result.data.data?.cover_letter_path ?? values.cover_letter_path ?? null,

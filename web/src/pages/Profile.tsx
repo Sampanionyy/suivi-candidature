@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { User } from 'lucide-react';
 import { toast } from 'sonner';
-import apiClient from '../services/api-service';
+import apiClient from '../services/api.service';
 import type { IDocument, IProfile, IProfileFormValues } from '../interfaces/types';
 import IdentitySection from '../components/profile/IdentitySection';
 import DocumentsSection from '../components/profile/DocumentsSection';

@@ -25,6 +25,7 @@ class Application extends Model
         'last_follow_up_date',
         'follow_up_count',
         'needs_follow_up',
+        'contact_email',
     ];
 
     protected $casts = [
@@ -33,6 +34,7 @@ class Application extends Model
         'last_follow_up_date' => 'date',
         'follow_up_count' => 'integer',
         'needs_follow_up' => 'boolean',
+        'contact_email' => 'string',
     ];
 
     public const STATUSES = [
@@ -143,5 +145,15 @@ class Application extends Model
             'follow_up_count' => $this->follow_up_count + 1,
             'needs_follow_up' => false,
         ]);
+    }
+
+    public function followUpEmails(): HasMany
+    {
+        return $this->hasMany(FollowUpEmail::class);
+    }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(ApplicationNote::class);
     }
 }

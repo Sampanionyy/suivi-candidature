@@ -23,6 +23,7 @@ class ApplicationResource extends JsonResource
             'status' => $this->status,
             'status_label' => $this->status_label,
             'interview_date' => $this->interview_date?->format('Y-m-d H:i'),
+            'contact_email' => $this->contact_email,
             'needs_follow_up' => $this->needs_follow_up,
             'last_follow_up_date' => $this->last_follow_up_date?->format('Y-m-d'),
             'follow_ups_count' => $this->follow_ups_count,

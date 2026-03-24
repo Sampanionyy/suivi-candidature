@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import apiClient from '../services/api-service';
+import apiClient from '../services/api.service';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import ByStatus from '../components/applications/stats/ByStatus';
+import ByStatus from '../components/stats/ByStatus';
 import type { IStats } from '../interfaces/types';
-import TopCompanies from '../components/applications/stats/TopCompanies';
-import UpcomingInterviews from '../components/applications/stats/UpcomingInterviews';
-import TotalApplicationsOverTime from '../components/applications/stats/TotalApplicationsOverTime';
-import PositionDistribution from '../components/applications/stats/PositionDistribution';
+import TopCompanies from '../components/stats/TopCompanies';
+import UpcomingInterviews from '../components/stats/UpcomingInterviews';
+import TotalApplicationsOverTime from '../components/stats/TotalApplicationsOverTime';
+import PositionDistribution from '../components/stats/PositionDistribution';
 
 const Statistics: React.FC = () => {
     const [stats, setStats] = useState<IStats | null>(null);

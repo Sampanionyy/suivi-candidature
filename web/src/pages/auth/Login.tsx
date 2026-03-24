@@ -4,7 +4,7 @@ import * as yup from "yup";
 import { toast } from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { loginUser } from "../../services/auth-service";
+import { loginUser } from "../../services/auth.service";
 import FormLogin from "../../components/auth/FormLogin";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
