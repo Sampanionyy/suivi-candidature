@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getAuthHeaders, getCurrentUserId } from '../utils/notification.utils';
+import { getAuthHeaders, getCurrentUserId } from '../lib/notification.utils';
 import type { INotification } from '../interfaces/types';
 import '../echo';
 

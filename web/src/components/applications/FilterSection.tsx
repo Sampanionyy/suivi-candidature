@@ -1,19 +1,10 @@
 import { Search } from 'lucide-react'
 import React from 'react'
+import type { IFilterApp } from '../../interfaces/types'
 
 interface FilterSectionProps {
-    filters: {
-        search: string
-        status: string
-        company: string
-        position: string
-    }
-    setFilters: React.Dispatch<React.SetStateAction<{
-        search: string
-        status: string
-        company: string
-        position: string
-    }>>
+    filters: IFilterApp
+    setFilters: React.Dispatch<React.SetStateAction<IFilterApp>>
 }
 
 const statusOptions = [

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getJobContractTypes, getSkillCategories, getSkills, getWorkModes } from '../services/profile-service';
+import { getJobContractTypes, getSkillCategories, getSkills, getWorkModes } from '../services/profile.service';
 
 export const usePreferencesData = () => {
     const [availableSkills, setAvailableSkills] = useState<any>([]);

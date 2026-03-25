@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import apiClient from '../services/api-service'; 
-import CalendarDetails from '../components/applications/calendar/CalendarDetails';
+import apiClient from '../services/api.service'; 
+import CalendarDetails from '../components/calendar/CalendarDetails';
 import type { Interview } from '../interfaces/types';
-import CalendarPrincipal from '../components/applications/calendar/CalendarPrincipal';
+import CalendarPrincipal from '../components/calendar/CalendarPrincipal';
 
 const CalendarPage: React.FC = () => {
     const [interviews, setInterviews] = useState<Interview[]>([]);

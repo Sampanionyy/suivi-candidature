@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import apiClient from '../services/api-service';
+import apiClient from '../services/api.service';
 
 const PHOTO_CONFIG = {
     MAX_SIZE: 5 * 1024 * 1024, // 5MB
