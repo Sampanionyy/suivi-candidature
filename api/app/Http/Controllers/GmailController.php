@@ -43,4 +43,24 @@ class GmailController extends Controller
 
         return $client;
     }
+
+    public function mails(Request $request)
+    {
+        $sanctumToken = $request->bearerToken();
+        $tokenRecord = \Laravel\Sanctum\PersonalAccessToken::findToken($sanctumToken);
+
+        if (!$tokenRecord) {
+            return response()->json(['error' => 'Non authentifié'], 401);
+        }
+
+        $user = $tokenRecord->tokenable;
+
+        if (!$user->gmail_token) {
+            return response()->json(['error' => 'Gmail non connecté'], 403);
+        }
+
+        $mails = app(\App\Services\GmailService::class)->getRecentMails($user, 5);
+
+        return response()->json($mails);
+    }
 }

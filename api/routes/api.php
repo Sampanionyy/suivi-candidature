@@ -95,3 +95,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/gmail/connect', [GmailController::class, 'redirect']);
 Route::get('/gmail/callback', [GmailController::class, 'callback']);
+Route::get('/gmail/mails', [GmailController::class, 'mails']);
