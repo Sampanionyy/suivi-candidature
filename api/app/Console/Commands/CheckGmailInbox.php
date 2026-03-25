@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use App\Services\GmailService;
 
 use Illuminate\Console\Command;
 
@@ -23,23 +24,12 @@ class CheckGmailInbox extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(GmailService $gmailService)
     {
         foreach (User::whereNotNull('gmail_token')->get() as $user) {
-            $client = $this->buildClient($user);
-            $gmail = new \Google\Service\Gmail($client);
-
-            $messages = $gmail->users_messages->listUsersMessages('me', [
-                'q' => 'is:unread newer_than:1d',
-                'maxResults' => 20,
-            ]);
-
-            foreach ($messages->getMessages() ?? [] as $msg) {
-                $full = $gmail->users_messages->get('me', $msg->getId(), [
-                    'format' => 'metadata',
-                    'metadataHeaders' => ['From', 'Subject', 'Date'],
-                ]);
-                ProcessIncomingEmail::dispatch($user, $full);
+            $mails = $gmailService->getRecentMails($user, 20);
+            foreach ($mails as $mail) {
+                ProcessIncomingEmail::dispatch($user, $mail);
             }
         }
     }

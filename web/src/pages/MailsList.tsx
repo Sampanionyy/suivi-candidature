@@ -8,6 +8,10 @@ interface IMail {
     from: string;
     date: string;
     snippet: string;
+    application?: {
+        company: string;
+        position: string;
+    };
 }
 
 const MailsList = () => {
@@ -105,7 +109,14 @@ const MailsList = () => {
                             <div className="flex items-start gap-3">
                                 <Mail width={18} className="text-slate-400 mt-0.5 shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-slate-800 truncate">{mail.subject}</p>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <p className="font-medium text-slate-800 truncate">{mail.subject}</p>
+                                        {mail.application && (
+                                            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full shrink-0">
+                                                {mail.application.company} — {mail.application.position}
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className="text-sm text-slate-500 truncate">{mail.from}</p>
                                     <p className="text-sm text-slate-400 mt-1 line-clamp-2">{mail.snippet}</p>
                                 </div>
