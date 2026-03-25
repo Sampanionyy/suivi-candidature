@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\FollowUpEmailController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OfferController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\GmailController;
+
 
 Route::get('/health', [HealthController::class, 'check']);
 
@@ -90,3 +92,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('work-modes',         WorkModeController::class);
     Route::apiResource('offers',             OfferController::class);
 });
+
+Route::get('/gmail/connect', [GmailController::class, 'redirect']);
+Route::get('/gmail/callback', [GmailController::class, 'callback']);
