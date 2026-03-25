@@ -90,8 +90,6 @@ services:
         <<: *api-common
         container_name: suivi_candidature_reverb
         entrypoint: []
-        ports:
-            - "6001:6001"
         depends_on:
             mysql:
                 condition: service_healthy
