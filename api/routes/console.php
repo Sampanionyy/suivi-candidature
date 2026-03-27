@@ -13,8 +13,17 @@ Schedule::command('applications:check-followups')
     ->dailyAt('11:48')
     ->timezone('Europe/Paris') 
     ->onSuccess(function () {
-        info('✅ Vérification des relances effectuée avec succès');
+        info('Vérification des relances effectuée avec succès');
     })
     ->onFailure(function () {
-        error('❌ Erreur lors de la vérification des relances');
+        error('Erreur lors de la vérification des relances');
+    });
+
+Schedule::command('app:check-gmail-inbox')
+    ->everyFiveMinutes()
+    ->onSuccess(function () {
+        info('Vérification de la boîte Gmail effectuée avec succès');
+    })
+    ->onFailure(function () {
+        error('Erreur lors de la vérification de la boîte Gmail');
     });
