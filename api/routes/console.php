@@ -19,7 +19,7 @@ Schedule::command('applications:check-followups')
         error('Erreur lors de la vérification des relances');
     });
 
-Schedule::command('gmail:check')
+Schedule::command('app:check-gmail-inbox')
     ->everyFiveMinutes()
     ->onSuccess(function () {
         info('Vérification de la boîte Gmail effectuée avec succès');
