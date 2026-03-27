@@ -13,6 +13,7 @@ import Profile from "./pages/Profile"
 import ProtectedRoute from "./components/ProtectedRoute"
 import AuthRedirect from "./components/AuthRedirect"
 import { SidebarProvider } from "./contexts/SidebarContext"
+import MailsList from "./pages/MailsList"
 
 function App() {
     return (
@@ -43,6 +44,7 @@ function App() {
                             <Route path="stats" element={<Statistics />} />
                             <Route path="calendar" element={<CalendarPage />} />
                             <Route path="profile" element={<Profile />} />
+                            <Route path="mails" element={<MailsList />} />
                         </Route>
                         
                         <Route path="*" element={<Navigate to="/dashboard" replace />} />

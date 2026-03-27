@@ -1,4 +1,4 @@
-import { Briefcase, BarChart3, Calendar, Home, X } from "lucide-react";
+import { Briefcase, BarChart3, Calendar, Home, X, Mails } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useUser } from "../../contexts/UserContext";
 import { useSidebar } from "../../contexts/SidebarContext";
@@ -8,6 +8,7 @@ const navigationItems = [
     { href: "/applications", icon: Briefcase, label: "Candidatures" },
     { href: "/stats",        icon: BarChart3,  label: "Statistiques" },
     { href: "/calendar",     icon: Calendar,   label: "Calendrier", requiresAuth: true },
+    { href: "/mails", icon: Mails,   label: "Mails", requiresAuth: true },
 ];
 
 export default function Sidebar() {
