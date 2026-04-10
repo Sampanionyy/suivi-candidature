@@ -1,8 +1,8 @@
 FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y \
-    zip unzip git curl libzip-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql zip bcmath pcntl \
+    zip unzip git curl libzip-dev libonig-dev libxml2-dev libpq-dev \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql pgsql zip bcmath pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -18,4 +18,4 @@ RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} storage/app/p
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-CMD php artisan reverb:start --host=0.0.0.0 --port=$PORT
+CMD sh -c "php artisan reverb:start --host=0.0.0.0 --port=${PORT}"
