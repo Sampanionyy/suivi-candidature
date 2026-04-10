@@ -3,14 +3,14 @@
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('interviews:send-reminders')
-    ->dailyAt('15:30')
+    ->dailyAt('15:48')
     ->timezone('Europe/Paris')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/interview-reminders.log'))
     ->description('Rappels d\'entretien (TEST)');
 
 Schedule::command('applications:check-followups')
-    ->dailyAt('15:35')
+    ->dailyAt('15:48')
     ->timezone('Europe/Paris') 
     ->onSuccess(function () {
         info('Vérification des relances effectuée avec succès');
