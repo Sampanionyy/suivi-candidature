@@ -20,4 +20,6 @@ RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} storage/app/p
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-CMD ["php", "artisan", "queue:work", "redis", "--sleep=3", "--tries=3", "--max-time=3600"]
+CMD php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600 & \
+    php -S 0.0.0.0:$PORT -t public &\
+    wait
