@@ -13,6 +13,7 @@ export default defineConfig({
         host: '0.0.0.0',  
         port: 5173,
         strictPort: true,
+        allowedHosts: ['suivi-candidature-web.onrender.com'],
         watch: {
             usePolling: true  
         }
