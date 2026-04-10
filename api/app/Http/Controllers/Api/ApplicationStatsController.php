@@ -51,8 +51,8 @@ class ApplicationStatsController extends Controller
 
             $applicationsOverTime = match($period) {
                 'month' => Application::select(
-                        DB::raw('YEAR(applied_date) as year'), 
-                        DB::raw('MONTH(applied_date) as month'), 
+                        DB::raw('EXTRACT(YEAR FROM applied_date) as year'),
+                        DB::raw('EXTRACT(MONTH FROM applied_date) as month'),
                         DB::raw('count(*) as total')
                     )
                     ->where('user_id', $userId)
@@ -61,7 +61,7 @@ class ApplicationStatsController extends Controller
                     ->orderBy('month')
                     ->get(),
                 'year' => Application::select(
-                        DB::raw('YEAR(applied_date) as year'), 
+                        DB::raw('EXTRACT(YEAR FROM applied_date) as year'),
                         DB::raw('count(*) as total')
                     )
                     ->where('user_id', $userId)
@@ -69,8 +69,8 @@ class ApplicationStatsController extends Controller
                     ->orderBy('year')
                     ->get(),
                 default => Application::select(
-                        DB::raw('YEAR(applied_date) as year'), 
-                        DB::raw('WEEK(applied_date) as week'), 
+                        DB::raw('EXTRACT(YEAR FROM applied_date) as year'),
+                        DB::raw('EXTRACT(WEEK FROM applied_date) as week'),
                         DB::raw('count(*) as total')
                     )
                     ->where('user_id', $userId)
