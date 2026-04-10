@@ -12,11 +12,9 @@ const applicationSchema = Yup.object({
     position: Yup.string().required("Le poste est requis"),
     company: Yup.string().required("L'entreprise est requise"),
     applied_date: Yup.date()
-        .required("La date est requise")
-        .min(today, "La date doit être aujourd'hui ou ultérieure"),
+        .required("La date est requise"),
     status: Yup.string().required("Le statut est requis"),
     interview_date: Yup.date()
-        .min(today, "La date doit être aujourd'hui ou ultérieure")
         .nullable()
         .when("status", {
             is: "interview",
