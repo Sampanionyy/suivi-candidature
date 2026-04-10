@@ -32,4 +32,4 @@ RUN mkdir -p storage/logs storage/framework/{cache,sessions,views} storage/app/p
 
 EXPOSE 8080
 
-CMD ["apache2-foreground"]
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
