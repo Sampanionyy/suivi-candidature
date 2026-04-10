@@ -11,7 +11,7 @@ window.Echo = new Echo({
     wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
-    authEndpoint: `/api/broadcasting/auth`,
+    authEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/broadcasting/auth`,  
     auth: {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
